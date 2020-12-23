@@ -34,28 +34,57 @@ class VNS
   private
 
   def optimize(solution)
+    shift_optimization(solution)
+    swap_optimization(solution)
+
+    solution
+  end
+
+  def shift_optimization(solution)
     initial_value = target_function(solution)
 
-    combinations = solution.values
-                           .combination(2)
-                           .map { |(a, b)| a.product(b) }
-                           .flatten(1)
+    people.product(sessions).each do |(person, session)|
+      original_session = find_session(solution, person)
+      shift(solution, session, person)
 
-    combinations.each do |(p1, p2)|
-      swap(solution, p1, p2)
-      if target_function(solution) < initial_value
-        puts "New enhancement! #{initial_value} => #{target_function(solution)}"
+      if feasible?(solution) && target_function(solution) < initial_value
+        puts "New shift enhancement! #{initial_value} => #{target_function(solution)}"
         return optimize(solution)
       else
-        swap(solution, p2, p1)
+        shift(solution, original_session, person)
       end
     end
 
     solution
   end
 
+  def swap_optimization(solution)
+    initial_value = target_function(solution)
+
+    combinations_of_two(solution).each do |(p1, p2)|
+      swap(solution, p1, p2)
+      if target_function(solution) < initial_value
+        puts "New swap enhancement! #{initial_value} => #{target_function(solution)}"
+        return optimize(solution)
+      else
+        swap(solution, p2, p1)
+      end
+    end
+  end
+
+  def combinations_of_two(solution)
+    solution.values
+            .combination(2)
+            .map { |(a, b)| a.product(b) }
+            .flatten(1)
+  end
+
   def happiness(person)
     preferences[person.id][find_session(@solution, person).id]
+  end
+
+  def feasible?(solution)
+    solution.values.all? { |group| group.size <= Session::MAX_ALLOCATION }
   end
 
   def swap(solution, person1, person2)
@@ -65,6 +94,11 @@ class VNS
     solution[session2].delete(person2)
     solution[session1] << person2
     solution[session2] << person1
+  end
+
+  def shift(solution, session, person)
+    solution[find_session(solution, person)].delete(person)
+    solution[session] << person
   end
 
   def find_session(solution, person)

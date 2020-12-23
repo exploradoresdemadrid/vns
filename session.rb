@@ -1,5 +1,5 @@
 class Session
-  MAX_ALLOCATION = 10
+  MAX_ALLOCATION = 8
   attr_reader :id, :name
 
   def initialize(id, name)
