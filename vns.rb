@@ -110,13 +110,15 @@ class VNS
   end
 
   def perturbate(solution)
-    extracted = []
+    2.times do
+      extracted = []
     solution.each do |_, people|
       extracted << people.delete_at(rand(people.length))
     end
 
     extracted.shuffle.each_with_index do |person, i|
       solution.values[i] << person
+    end
     end
   end
 
