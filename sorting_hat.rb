@@ -321,13 +321,8 @@ preferences = [
   %w[6 4 3 2 5 1]
 ].map { |a| a.map(&:to_i) }
 
-puts people.map(&:to_s).join("\n")
-puts
-puts sessions.map(&:to_s).join("\n")
-puts
-
 vns = VNS.new(people, sessions, preferences)
 vns.run
 puts "Result: #{vns.target_function}"
 
-raise 'Suspicious result' if vns.target_function > 180
+raise 'Suspicious result' if vns.target_function > 170
