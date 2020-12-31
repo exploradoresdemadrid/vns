@@ -19,7 +19,7 @@ jobs:
           paths:
             - vendor/bundle
       - run:
-          command: ruby ./sorting-hat.rb
+          command: bundle exec ruby ./sorting_hat.rb
 workflows:
   version: 2
   build:
