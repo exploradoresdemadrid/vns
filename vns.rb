@@ -61,8 +61,6 @@ class VNS
         shift(solution, original_session, person)
       end
     end
-
-    solution
   end
 
   def swap_optimization(solution)
