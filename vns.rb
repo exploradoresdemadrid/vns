@@ -31,6 +31,14 @@ class VNS
     nil
   end
 
+  def target_function(solution=@solution)
+    solution.map do |session, people|
+      people.map do |person|
+        preferences[person.id][session.id]
+      end
+    end.flatten.inject(:+)
+  end
+
   private
 
   def optimize(solution)
@@ -103,13 +111,5 @@ class VNS
 
   def find_session(solution, person)
     sessions.detect { |s| solution[s].include?(person) }
-  end
-
-  def target_function(solution)
-    solution.map do |session, people|
-      people.map do |person|
-        preferences[person.id][session.id]
-      end
-    end.flatten.inject(:+)
   end
 end
