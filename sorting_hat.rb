@@ -326,6 +326,6 @@ puts
 puts sessions.map(&:to_s).join("\n")
 puts
 
-vns = VNS.new(people.shuffle, sessions.shuffle, preferences)
+vns = VNS.new(people, sessions, preferences)
 vns.run
 puts "Result: #{vns.target_function}"
