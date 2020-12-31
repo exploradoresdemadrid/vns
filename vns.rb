@@ -3,6 +3,8 @@ class VNS
   require 'active_support/all'
   attr_reader :people, :sessions, :preferences
 
+  PERTURBATION_COUNT = 100
+
   def initialize(people, sessions, preferences)
     @people = people
     @sessions = sessions
@@ -12,7 +14,7 @@ class VNS
   def run
     initial_groups = people.in_groups(sessions.count).map(&:compact)
     initial_solution = sessions.zip(initial_groups).to_h
-    @solution = optimize(initial_solution)
+    @solution = global_optimize(initial_solution)
 
     self
   end
@@ -32,6 +34,8 @@ class VNS
   end
 
   def target_function(solution = @solution)
+    return Float::INFINITY unless solution
+
     solution.map do |session, people|
       people.map do |person|
         preferences[person.id][session.id]
@@ -41,11 +45,40 @@ class VNS
 
   private
 
-  def optimize(solution)
+  def global_optimize(initial_solution)
+    best_solution = initial_solution
+
+    first_solution = initial_solution.dup
+    local_optimize(first_solution)
+
+    puts "First solution => #{target_function(first_solution)}"
+    best_solution = first_solution
+
+    PERTURBATION_COUNT.times do |counter|
+      temporary_solution = clone(best_solution)
+      perturbate(temporary_solution)
+      local_optimize(temporary_solution)
+
+      puts "Perturbation #{counter + 1} => #{target_function(temporary_solution)} vs #{target_function(best_solution)}"
+
+      if target_function(temporary_solution) < target_function(best_solution)
+        puts 'Updated best solution'
+        best_solution = temporary_solution
+      end
+    end
+
+    best_solution
+  end
+
+  def clone(solution)
+    solution.map do |k, v|
+      [k, v.dup]
+    end.to_h
+  end
+
+  def local_optimize(solution)
     shift_optimization(solution)
     swap_optimization(solution)
-
-    solution
   end
 
   def shift_optimization(solution)
@@ -56,7 +89,7 @@ class VNS
       shift(solution, session, person)
 
       if feasible?(solution) && target_function(solution) < initial_value
-        return optimize(solution)
+        return local_optimize(solution)
       else
         shift(solution, original_session, person)
       end
@@ -69,10 +102,21 @@ class VNS
     combinations_of_two(solution).each do |(p1, p2)|
       swap(solution, p1, p2)
       if target_function(solution) < initial_value
-        return optimize(solution)
+        return local_optimize(solution)
       else
         swap(solution, p2, p1)
       end
+    end
+  end
+
+  def perturbate(solution)
+    extracted = []
+    solution.each do |_, people|
+      extracted << people.delete_at(rand(people.length))
+    end
+
+    extracted.shuffle.each_with_index do |person, i|
+      solution.values[i] << person
     end
   end
 
