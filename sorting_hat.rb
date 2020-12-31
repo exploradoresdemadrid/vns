@@ -325,4 +325,4 @@ vns = VNS.new(people, sessions, preferences)
 vns.run
 puts "Result: #{vns.target_function}"
 
-raise 'Suspicious result' if vns.target_function > 180
+raise 'Suspicious result' if vns.target_function > 170
