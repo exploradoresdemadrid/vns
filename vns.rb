@@ -31,7 +31,7 @@ class VNS
     nil
   end
 
-  def target_function(solution=@solution)
+  def target_function(solution = @solution)
     solution.map do |session, people|
       people.map do |person|
         preferences[person.id][session.id]
@@ -56,7 +56,6 @@ class VNS
       shift(solution, session, person)
 
       if feasible?(solution) && target_function(solution) < initial_value
-        puts "New shift enhancement! #{initial_value} => #{target_function(solution)}"
         return optimize(solution)
       else
         shift(solution, original_session, person)
@@ -72,7 +71,6 @@ class VNS
     combinations_of_two(solution).each do |(p1, p2)|
       swap(solution, p1, p2)
       if target_function(solution) < initial_value
-        puts "New swap enhancement! #{initial_value} => #{target_function(solution)}"
         return optimize(solution)
       else
         swap(solution, p2, p1)
