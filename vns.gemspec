@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://rubygems.org/exploradoresdemadrid/vns'
   s.license = 'MIT'
 
+  s.require_paths = ['lib']
+
   s.add_runtime_dependency 'activesupport'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rubocop'
