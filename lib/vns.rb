@@ -1,6 +1,6 @@
 module VNS
-  require 'person'
-  require 'session'
+  require './person'
+  require './session'
   require 'active_support/all'
 
   class VNS
