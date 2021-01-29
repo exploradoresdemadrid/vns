@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vns (0.1.1)
+    vns (0.2.0.pre.rc.1)
       activesupport
 
 GEM

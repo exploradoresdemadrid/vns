@@ -71,7 +71,7 @@ module VNS
         end
 
         progress = (counter + 1) * 1.0 / PERTURBATION_COUNT
-        @inspection.call(progress, target_function(best_solution)) if @inspection
+        @inspection.call(progress, target_function(best_solution), best_solution) if @inspection
       end
 
       best_solution
