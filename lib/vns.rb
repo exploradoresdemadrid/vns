@@ -71,7 +71,7 @@ module VNS
         end
 
         progress = (counter + 1) * 1.0 / PERTURBATION_COUNT
-        @inspection.call(progress, target_function(best_solution), best_solution) if @inspection
+        @inspection&.call(progress, target_function(best_solution), public_format(best_solution))
       end
 
       best_solution
@@ -119,13 +119,13 @@ module VNS
     def perturbate(solution)
       2.times do
         extracted = []
-      solution.each do |_, people|
-        extracted << people.delete_at(rand(people.length))
-      end
+        solution.each do |_, people|
+          extracted << people.delete_at(rand(people.length))
+        end
 
-      extracted.shuffle.each_with_index do |person, i|
-        solution.values[i] << person
-      end
+        extracted.shuffle.each_with_index do |person, i|
+          solution.values[i] << person
+        end
       end
     end
 
@@ -160,6 +160,10 @@ module VNS
 
     def find_session(solution, person)
       sessions.detect { |s| solution[s].include?(person) }
+    end
+
+    def public_format(solution)
+      solution.map { |k, v| [k.name, v.map(&:name)] }.to_h
     end
   end
 end
