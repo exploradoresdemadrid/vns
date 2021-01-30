@@ -1,6 +1,5 @@
 module VNS
   class Session
-    MAX_ALLOCATION = 25
     attr_reader :id, :name
 
     def initialize(id, name)

@@ -4,15 +4,16 @@ module VNS
   require 'active_support/all'
 
   class VNS
-    attr_reader :people, :sessions, :preferences
+    attr_reader :people, :sessions, :preferences, :max_allocation
 
     PERTURBATION_COUNT = 100
 
-    def initialize(people, sessions, preferences, &inspection)
+    def initialize(people, sessions, preferences, max_allocation, &inspection)
       @people = people.map.with_index { |person, i| Person.new(i, person) }
       @sessions = sessions.map.with_index { |session, i| Session.new(i, session) }
       @preferences = preferences
       @inspection = inspection
+      @max_allocation = max_allocation
     end
 
     def run
@@ -141,7 +142,7 @@ module VNS
     end
 
     def feasible?(solution)
-      solution.values.all? { |group| group.size <= Session::MAX_ALLOCATION }
+      solution.values.all? { |group| group.size <= max_allocation }
     end
 
     def swap(solution, person1, person2)
