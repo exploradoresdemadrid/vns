@@ -4,16 +4,17 @@ module VNS
   require 'active_support/all'
 
   class VNS
-    attr_reader :people, :sessions, :preferences, :max_allocation
+    attr_reader :people, :sessions, :preferences, :max_allocation, :group_duplication_factor
 
     PERTURBATION_COUNT = 100
 
-    def initialize(people, sessions, preferences, max_allocation, &inspection)
-      @people = people.map.with_index { |person, i| Person.new(i, person) }
+    def initialize(people, groups, sessions, preferences, max_allocation, group_duplication_factor, &inspection)
+      @people = people.map.with_index { |person, i| Person.new(i, person, groups[i]) }
       @sessions = sessions.map.with_index { |session, i| Session.new(i, session) }
       @preferences = preferences
       @inspection = inspection
       @max_allocation = max_allocation
+      @group_duplication_factor = group_duplication_factor
     end
 
     def run
@@ -41,11 +42,19 @@ module VNS
     def target_function(solution = @solution)
       return Float::INFINITY unless solution
 
-      solution.map do |session, people|
-        people.map do |person|
-          preferences[person.id][session.id]
-        end
-      end.flatten.inject(:+)
+      individual_penalty = solution.map do |session, people|
+                             people.map do |person|
+                               preferences[person.id][session.id]
+                             end
+                           end.flatten.inject(:+)
+
+      group_penalty = solution.map do |session, people| 
+        people.group_by(&:group).map{|group, people| people.count - 1 }.sum
+      end.inject(:+)
+
+      Rails.logger.info "Penalty: #{individual_penalty} + #{group_penalty}"
+
+      individual_penalty + group_duplication_factor * group_penalty
     end
 
     private
