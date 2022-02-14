@@ -1,13 +1,14 @@
 module VNS
   class Person
-    attr_reader :id, :name
-    def initialize(id, name)
+    attr_reader :id, :name, :group
+    def initialize(id, name, group)
       @id = id
       @name = name
+      @group = group
     end
 
     def to_s
-      "#{id}\t#{name}"
+      "#{id}\t#{name} (#{group})"
     end
   end
 end
