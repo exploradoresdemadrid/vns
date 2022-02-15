@@ -52,8 +52,6 @@ module VNS
         people.group_by(&:group).map{|group, people| people.count - 1 }.sum
       end.inject(:+)
 
-      Rails.logger.info "Penalty: #{individual_penalty} + #{group_penalty}"
-
       individual_penalty + group_duplication_factor * group_penalty
     end
 
